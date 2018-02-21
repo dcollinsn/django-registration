@@ -1,25 +1,16 @@
 """
-URLs used in the unit tests for django-registration.
-
-You should not attempt to use these URLs in any sort of real or
-development environment.
+URLconf for registration and activation, using django-registration's
+two-step model-based activation workflow.
 
 """
 
 from django.conf.urls import include, url
 from django.views.generic.base import TemplateView
 
-from registration.backends.model_activation.views import RegistrationView
-
-from .views import ActivateWithComplexRedirect
+from . import views
 
 
 urlpatterns = [
-    url(r'^$',
-        TemplateView.as_view(
-            template_name='registration/activation_complete.html'
-        ),
-        name='simple_activation_redirect'),
     url(r'^activate/complete/$',
         TemplateView.as_view(
             template_name='registration/activation_complete.html'
@@ -30,10 +21,10 @@ urlpatterns = [
     # the view; that way it can return a sensible "invalid key"
     # message instead of a confusing 404.
     url(r'^activate/(?P<activation_key>\w+)/$',
-        ActivateWithComplexRedirect.as_view(),
+        views.ActivationView.as_view(),
         name='registration_activate'),
     url(r'^register/$',
-        RegistrationView.as_view(),
+        views.RegistrationView.as_view(),
         name='registration_register'),
     url(r'^register/complete/$',
         TemplateView.as_view(

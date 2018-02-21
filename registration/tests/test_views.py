@@ -3,11 +3,9 @@ Tests for django-registration's built-in views.
 
 """
 
-from django.core import signing
 from django.test import override_settings
 
-from registration.backends.hmac.views import REGISTRATION_SALT
-
+from ..models import RegistrationProfile
 from .base import RegistrationTestCase
 
 from django.urls import reverse
@@ -32,16 +30,15 @@ class ActivationViewTests(RegistrationTestCase):
             data=self.valid_data
         )
 
-        activation_key = signing.dumps(
-            obj=self.valid_data[self.user_model.USERNAME_FIELD],
-            salt=REGISTRATION_SALT
+        profile = RegistrationProfile.objects.get(
+            user__username=self.valid_data[self.user_model.USERNAME_FIELD]
         )
 
         resp = self.client.get(
             reverse(
                 'registration_activate',
                 args=(),
-                kwargs={'activation_key': activation_key}
+                kwargs={'activation_key': profile.activation_key}
             )
         )
         self.assertRedirects(resp, '/activate/complete/')
